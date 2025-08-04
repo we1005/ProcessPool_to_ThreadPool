@@ -1,0 +1,288 @@
+#ifndef PROCESS_POOL_CONFIG_H
+#define PROCESS_POOL_CONFIG_H
+
+/* Project version */
+#define PROCESS_POOL_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define PROCESS_POOL_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define PROCESS_POOL_VERSION_PATCH @PROJECT_VERSION_PATCH@
+#define PROCESS_POOL_VERSION "@PROJECT_VERSION@"
+
+/* System feature detection */
+#cmakedefine HAVE_EPOLL
+#cmakedefine HAVE_EVENTFD
+#cmakedefine HAVE_SIGNALFD
+#cmakedefine HAVE_TIMERFD
+#cmakedefine HAVE_PIDFD
+#cmakedefine HAVE_EPOLL_CREATE1
+#cmakedefine HAVE_EVENTFD_FUNC
+#cmakedefine HAVE_SIGNALFD_FUNC
+#cmakedefine HAVE_TIMERFD_CREATE
+#cmakedefine HAVE_PIDFD_OPEN
+#cmakedefine HAVE_EPOLL_CLOEXEC
+#cmakedefine HAVE_EFD_CLOEXEC
+#cmakedefine HAVE_SFD_CLOEXEC
+#cmakedefine HAVE_TFD_CLOEXEC
+#cmakedefine HAVE_STDATOMIC_H
+
+/* Build configuration */
+#cmakedefine BUILD_SHARED_LIBS
+#cmakedefine ENABLE_DEBUG
+#cmakedefine ENABLE_ASAN
+#cmakedefine ENABLE_TSAN
+#cmakedefine ENABLE_UBSAN
+#cmakedefine ENABLE_COVERAGE
+
+/* Compiler and platform detection */
+#ifdef __GNUC__
+    #define PROCESS_POOL_COMPILER_GCC
+    #define PROCESS_POOL_COMPILER_VERSION __GNUC__
+#elif defined(__clang__)
+    #define PROCESS_POOL_COMPILER_CLANG
+    #define PROCESS_POOL_COMPILER_VERSION __clang_major__
+#endif
+
+#ifdef __linux__
+    #define PROCESS_POOL_PLATFORM_LINUX
+#endif
+
+/* Feature availability macros */
+#ifdef HAVE_EPOLL
+    #define PROCESS_POOL_USE_EPOLL 1
+#else
+    #error "epoll is required for this process pool implementation"
+#endif
+
+#ifdef HAVE_EVENTFD
+    #define PROCESS_POOL_USE_EVENTFD 1
+#else
+    #error "eventfd is required for this process pool implementation"
+#endif
+
+#ifdef HAVE_SIGNALFD
+    #define PROCESS_POOL_USE_SIGNALFD 1
+#endif
+
+#ifdef HAVE_TIMERFD
+    #define PROCESS_POOL_USE_TIMERFD 1
+#endif
+
+#ifdef HAVE_PIDFD
+    #define PROCESS_POOL_USE_PIDFD 1
+#endif
+
+/* Atomic operations */
+#ifdef HAVE_STDATOMIC_H
+    #define PROCESS_POOL_USE_STDATOMIC 1
+#else
+    #error "stdatomic.h is required for this process pool implementation"
+#endif
+
+/* Compiler attributes */
+#ifdef PROCESS_POOL_COMPILER_GCC
+    #define PROCESS_POOL_LIKELY(x)   __builtin_expect(!!(x), 1)
+    #define PROCESS_POOL_UNLIKELY(x) __builtin_expect(!!(x), 0)
+    #define PROCESS_POOL_INLINE      __inline__
+    #define PROCESS_POOL_ALWAYS_INLINE __attribute__((always_inline))
+    #define PROCESS_POOL_NOINLINE    __attribute__((noinline))
+    #define PROCESS_POOL_PURE        __attribute__((pure))
+    #define PROCESS_POOL_CONST       __attribute__((const))
+    #define PROCESS_POOL_MALLOC      __attribute__((malloc))
+    #define PROCESS_POOL_WARN_UNUSED __attribute__((warn_unused_result))
+    #define PROCESS_POOL_DEPRECATED  __attribute__((deprecated))
+    #define PROCESS_POOL_PACKED      __attribute__((packed))
+    #define PROCESS_POOL_ALIGNED(x)  __attribute__((aligned(x)))
+    #define PROCESS_POOL_SECTION(x)  __attribute__((section(x)))
+    #define PROCESS_POOL_WEAK        __attribute__((weak))
+    #define PROCESS_POOL_ALIAS(x)    __attribute__((alias(x)))
+    #define PROCESS_POOL_FORMAT(a,b) __attribute__((format(printf, a, b)))
+    #define PROCESS_POOL_NORETURN    __attribute__((noreturn))
+    #define PROCESS_POOL_CONSTRUCTOR __attribute__((constructor))
+    #define PROCESS_POOL_DESTRUCTOR  __attribute__((destructor))
+#elif defined(PROCESS_POOL_COMPILER_CLANG)
+    #define PROCESS_POOL_LIKELY(x)   __builtin_expect(!!(x), 1)
+    #define PROCESS_POOL_UNLIKELY(x) __builtin_expect(!!(x), 0)
+    #define PROCESS_POOL_INLINE      __inline__
+    #define PROCESS_POOL_ALWAYS_INLINE __attribute__((always_inline))
+    #define PROCESS_POOL_NOINLINE    __attribute__((noinline))
+    #define PROCESS_POOL_PURE        __attribute__((pure))
+    #define PROCESS_POOL_CONST       __attribute__((const))
+    #define PROCESS_POOL_MALLOC      __attribute__((malloc))
+    #define PROCESS_POOL_WARN_UNUSED __attribute__((warn_unused_result))
+    #define PROCESS_POOL_DEPRECATED  __attribute__((deprecated))
+    #define PROCESS_POOL_PACKED      __attribute__((packed))
+    #define PROCESS_POOL_ALIGNED(x)  __attribute__((aligned(x)))
+    #define PROCESS_POOL_SECTION(x)  __attribute__((section(x)))
+    #define PROCESS_POOL_WEAK        __attribute__((weak))
+    #define PROCESS_POOL_ALIAS(x)    __attribute__((alias(x)))
+    #define PROCESS_POOL_FORMAT(a,b) __attribute__((format(printf, a, b)))
+    #define PROCESS_POOL_NORETURN    __attribute__((noreturn))
+    #define PROCESS_POOL_CONSTRUCTOR __attribute__((constructor))
+    #define PROCESS_POOL_DESTRUCTOR  __attribute__((destructor))
+#else
+    #define PROCESS_POOL_LIKELY(x)   (x)
+    #define PROCESS_POOL_UNLIKELY(x) (x)
+    #define PROCESS_POOL_INLINE      inline
+    #define PROCESS_POOL_ALWAYS_INLINE inline
+    #define PROCESS_POOL_NOINLINE
+    #define PROCESS_POOL_PURE
+    #define PROCESS_POOL_CONST
+    #define PROCESS_POOL_MALLOC
+    #define PROCESS_POOL_WARN_UNUSED
+    #define PROCESS_POOL_DEPRECATED
+    #define PROCESS_POOL_PACKED
+    #define PROCESS_POOL_ALIGNED(x)
+    #define PROCESS_POOL_SECTION(x)
+    #define PROCESS_POOL_WEAK
+    #define PROCESS_POOL_ALIAS(x)
+    #define PROCESS_POOL_FORMAT(a,b)
+    #define PROCESS_POOL_NORETURN
+    #define PROCESS_POOL_CONSTRUCTOR
+    #define PROCESS_POOL_DESTRUCTOR
+#endif
+
+/* Memory barriers and cache line size */
+#define PROCESS_POOL_CACHE_LINE_SIZE 64
+#define PROCESS_POOL_CACHE_ALIGNED PROCESS_POOL_ALIGNED(PROCESS_POOL_CACHE_LINE_SIZE)
+
+/* Memory ordering */
+#ifdef PROCESS_POOL_USE_STDATOMIC
+    #include <stdatomic.h>
+    #define PROCESS_POOL_MEMORY_ORDER_RELAXED memory_order_relaxed
+    #define PROCESS_POOL_MEMORY_ORDER_CONSUME memory_order_consume
+    #define PROCESS_POOL_MEMORY_ORDER_ACQUIRE memory_order_acquire
+    #define PROCESS_POOL_MEMORY_ORDER_RELEASE memory_order_release
+    #define PROCESS_POOL_MEMORY_ORDER_ACQ_REL memory_order_acq_rel
+    #define PROCESS_POOL_MEMORY_ORDER_SEQ_CST memory_order_seq_cst
+#endif
+
+/* Debug and logging */
+#ifdef DEBUG
+    #define PROCESS_POOL_DEBUG 1
+    #define PROCESS_POOL_LOG_LEVEL_DEFAULT 3  /* DEBUG */
+#else
+    #define PROCESS_POOL_DEBUG 0
+    #define PROCESS_POOL_LOG_LEVEL_DEFAULT 2  /* INFO */
+#endif
+
+/* Performance tuning */
+#define PROCESS_POOL_DEFAULT_WORKER_COUNT 0  /* Auto-detect */
+#define PROCESS_POOL_DEFAULT_QUEUE_SIZE 1024
+#define PROCESS_POOL_DEFAULT_MAX_WORKERS 256
+#define PROCESS_POOL_DEFAULT_WORKER_IDLE_TIMEOUT 30000  /* 30 seconds */
+#define PROCESS_POOL_DEFAULT_TASK_TIMEOUT 0  /* No timeout */
+#define PROCESS_POOL_DEFAULT_HEARTBEAT_INTERVAL 5000  /* 5 seconds */
+
+/* Memory limits */
+#define PROCESS_POOL_MAX_TASK_DATA_SIZE (1024 * 1024)  /* 1MB */
+#define PROCESS_POOL_MAX_SHARED_MEMORY_SIZE (64 * 1024 * 1024)  /* 64MB */
+#define PROCESS_POOL_MAX_POOL_NAME_LENGTH 64
+#define PROCESS_POOL_MAX_WORKER_NAME_LENGTH 32
+
+/* Error handling */
+#define PROCESS_POOL_ERROR_BUFFER_SIZE 256
+
+/* Feature flags */
+#define PROCESS_POOL_FEATURE_DYNAMIC_SCALING 1
+#define PROCESS_POOL_FEATURE_TASK_PRIORITIES 1
+#define PROCESS_POOL_FEATURE_TASK_CANCELLATION 1
+#define PROCESS_POOL_FEATURE_WORKER_AFFINITY 1
+#define PROCESS_POOL_FEATURE_METRICS 1
+#define PROCESS_POOL_FEATURE_TRACING 1
+
+/* Compatibility */
+#ifndef __has_builtin
+    #define __has_builtin(x) 0
+#endif
+
+#ifndef __has_attribute
+    #define __has_attribute(x) 0
+#endif
+
+#ifndef __has_feature
+    #define __has_feature(x) 0
+#endif
+
+/* Static assertions */
+#ifdef __STDC_VERSION__
+    #if __STDC_VERSION__ >= 201112L
+        #define PROCESS_POOL_STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+    #else
+        #define PROCESS_POOL_STATIC_ASSERT(cond, msg) \
+            typedef char static_assertion_##__LINE__[(cond) ? 1 : -1]
+    #endif
+#else
+    #define PROCESS_POOL_STATIC_ASSERT(cond, msg) \
+        typedef char static_assertion_##__LINE__[(cond) ? 1 : -1]
+#endif
+
+/* Branch prediction hints */
+#if defined(PROCESS_POOL_COMPILER_GCC) || defined(PROCESS_POOL_COMPILER_CLANG)
+    #define PROCESS_POOL_PREDICT_TRUE(x)  PROCESS_POOL_LIKELY(x)
+    #define PROCESS_POOL_PREDICT_FALSE(x) PROCESS_POOL_UNLIKELY(x)
+#else
+    #define PROCESS_POOL_PREDICT_TRUE(x)  (x)
+    #define PROCESS_POOL_PREDICT_FALSE(x) (x)
+#endif
+
+/* Prefetch hints */
+#if defined(PROCESS_POOL_COMPILER_GCC) || defined(PROCESS_POOL_COMPILER_CLANG)
+    #define PROCESS_POOL_PREFETCH_READ(addr)  __builtin_prefetch(addr, 0, 3)
+    #define PROCESS_POOL_PREFETCH_WRITE(addr) __builtin_prefetch(addr, 1, 3)
+#else
+    #define PROCESS_POOL_PREFETCH_READ(addr)  ((void)0)
+    #define PROCESS_POOL_PREFETCH_WRITE(addr) ((void)0)
+#endif
+
+/* Unreachable code hint */
+#if defined(PROCESS_POOL_COMPILER_GCC) && (__GNUC__ >= 5)
+    #define PROCESS_POOL_UNREACHABLE() __builtin_unreachable()
+#elif defined(PROCESS_POOL_COMPILER_CLANG) && __has_builtin(__builtin_unreachable)
+    #define PROCESS_POOL_UNREACHABLE() __builtin_unreachable()
+#else
+    #define PROCESS_POOL_UNREACHABLE() abort()
+#endif
+
+/* Thread-local storage */
+#ifdef __STDC_VERSION__
+    #if __STDC_VERSION__ >= 201112L
+        #define PROCESS_POOL_THREAD_LOCAL _Thread_local
+    #else
+        #define PROCESS_POOL_THREAD_LOCAL __thread
+    #endif
+#else
+    #define PROCESS_POOL_THREAD_LOCAL __thread
+#endif
+
+/* Visibility control */
+#ifdef BUILD_SHARED_LIBS
+    #if defined(PROCESS_POOL_COMPILER_GCC) || defined(PROCESS_POOL_COMPILER_CLANG)
+        #define PROCESS_POOL_API __attribute__((visibility("default")))
+        #define PROCESS_POOL_INTERNAL __attribute__((visibility("hidden")))
+    #else
+        #define PROCESS_POOL_API
+        #define PROCESS_POOL_INTERNAL
+    #endif
+#else
+    #define PROCESS_POOL_API
+    #define PROCESS_POOL_INTERNAL
+#endif
+
+/* Sanitizer detection */
+#ifdef ENABLE_ASAN
+    #define PROCESS_POOL_HAS_ASAN 1
+#endif
+
+#ifdef ENABLE_TSAN
+    #define PROCESS_POOL_HAS_TSAN 1
+#endif
+
+#ifdef ENABLE_UBSAN
+    #define PROCESS_POOL_HAS_UBSAN 1
+#endif
+
+/* Coverage detection */
+#ifdef ENABLE_COVERAGE
+    #define PROCESS_POOL_HAS_COVERAGE 1
+#endif
+
+#endif /* PROCESS_POOL_CONFIG_H */
