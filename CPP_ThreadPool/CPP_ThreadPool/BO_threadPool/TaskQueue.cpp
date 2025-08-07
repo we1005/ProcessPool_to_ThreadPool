@@ -83,7 +83,8 @@ ElemType TaskQueue::pop()
 
 void TaskQueue::wakeup()
 {
-    m_flag = false;
+    m_flag = false;//表示线程池要退出了
+
     m_notEmpty.notify_all();
 }
 
