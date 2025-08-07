@@ -115,7 +115,13 @@ void ThreadPool::doTask() {
         }
         else
         {
-            cout << "ptask is a nullptr" << endl;
+            if(m_isExit) {
+                break;  // 退出循环
+            }
+            else
+            {
+                cout << "ptask is a nullptr" << endl;
+            }
         }
     }
 }
